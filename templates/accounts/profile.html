@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} — Profile — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Profile Sidebar -->
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 rounded-4 text-center p-4">
+        <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mx-auto mb-3 shadow" style="width: 90px; height: 90px; font-size: 2.5rem;">
+          {{ profile_user.first_name|default:profile_user.username|make_list|first|upper }}
+        </div>
+
+        <h4 class="fw-bold mb-1">{{ profile_user.get_full_name|default:profile_user.username }}</h4>
+        <div class="mb-2">
+          <span class="badge bg-success-subtle text-success border border-success px-2 py-1">
+            {{ profile_user.get_role_display }}
+          </span>
+        </div>
+
+        {% if profile_user.organization_name %}
+          <p class="text-muted small mb-2"><i class="bi bi-building me-1"></i> {{ profile_user.organization_name }}</p>
+        {% endif %}
+
+        {% if profile_user.location %}
+          <p class="text-muted small mb-3"><i class="bi bi-geo-alt me-1 text-danger"></i> {{ profile_user.location }}</p>
+        {% endif %}
+
+        {% if profile_user.bio %}
+          <p class="small text-secondary text-start p-3 bg-light rounded-3 mb-3">{{ profile_user.bio }}</p>
+        {% endif %}
+
+        {% if is_own_profile %}
+          <a href="{% url 'accounts:profile_edit' %}" class="btn btn-outline-success btn-sm w-100 mb-2">
+            <i class="bi bi-pencil-square me-1"></i> Edit Profile
+          </a>
+        {% endif %}
+
+        <!-- Skills Section -->
+        <div class="text-start mt-3 pt-3 border-top">
+          <h6 class="fw-bold small text-muted text-uppercase mb-2"><i class="bi bi-tools me-1"></i> Skills</h6>
+          <div class="d-flex flex-wrap gap-1">
+            {% for skill in profile_user.get_skills_list %}
+              <span class="badge bg-secondary-subtle text-secondary border">{{ skill }}</span>
+            {% empty %}
+              <span class="small text-muted">No skills listed yet.</span>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Interests Section -->
+        <div class="text-start mt-3 pt-3 border-top">
+          <h6 class="fw-bold small text-muted text-uppercase mb-2"><i class="bi bi-heart me-1"></i> Domain Interests</h6>
+          <div class="d-flex flex-wrap gap-1">
+            {% for interest in profile_user.get_interests_list %}
+              <span class="badge bg-success-subtle text-success border border-success">{{ interest }}</span>
+            {% empty %}
+              <span class="small text-muted">No interests listed yet.</span>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content: Contributions -->
+    <div class="col-lg-8">
+      <!-- Created Challenges -->
+      <div class="card shadow-sm border-0 rounded-4 mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-flag text-success me-2"></i> Challenges Posted ({{ user_challenges.count }})</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if user_challenges %}
+            <div class="list-group list-group-flush">
+              {% for c in user_challenges %}
+                <div class="list-group-item p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="badge bg-success-subtle text-success">{{ c.category.name }}</span>
+                    <span class="badge bg-primary">{{ c.get_status_display }}</span>
+                  </div>
+                  <h6 class="fw-bold mb-1">
+                    <a href="{% url 'challenges:challenge_detail' slug=c.slug %}" class="text-dark text-decoration-none">
+                      {{ c.title }}
+                    </a>
+                  </h6>
+                  <p class="small text-muted mb-0 text-truncate-3">{{ c.description }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="p-4 text-center text-muted small">No challenges posted by this user.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Submitted Proposals -->
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-lightbulb text-warning me-2"></i> Solutions Proposed ({{ user_proposals.count }})</h5>
+        </div>
+        <div class="card-body p-0">
+          {% if user_proposals %}
+            <div class="list-group list-group-flush">
+              {% for p in user_proposals %}
+                <div class="list-group-item p-3">
+                  <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small text-muted">For: <strong>{{ p.challenge.title|truncatechars:40 }}</strong></span>
+                    <span class="badge bg-info text-dark"><i class="bi bi-hand-thumbs-up me-1"></i>{{ p.upvotes_count }}</span>
+                  </div>
+                  <h6 class="fw-bold mb-1">
+                    <a href="{% url 'solutions:proposal_detail' pk=p.pk %}" class="text-dark text-decoration-none">
+                      {{ p.title }}
+                    </a>
+                  </h6>
+                  <p class="small text-muted mb-0 text-truncate-3">{{ p.summary }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="p-4 text-center text-muted small">No solution proposals submitted yet.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

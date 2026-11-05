@@ -1,0 +1,423 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ challenge.title }} — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'challenges:landing' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'challenges:challenge_list' %}" class="text-decoration-none">Challenges</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'challenges:challenge_list' %}?category={{ challenge.category.slug }}" class="text-decoration-none">{{ challenge.category.name }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ challenge.title|truncatechars:35 }}</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Main Content Column -->
+    <div class="col-lg-8">
+      <!-- Challenge Header Card -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden">
+        {% if challenge.problem_image %}
+          <img src="{{ challenge.problem_image.url }}" class="img-fluid w-100" style="max-height: 380px; object-fit: cover;" alt="{{ challenge.title }}">
+        {% endif %}
+
+        <div class="card-body p-4">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <span class="badge bg-success-subtle text-success border border-success px-3 py-1">
+                <i class="bi {{ challenge.category.icon_class }} me-1"></i> {{ challenge.category.name }}
+              </span>
+              <span class="badge {% if challenge.status == 'open' %}bg-primary{% elif challenge.status == 'in_progress' %}bg-warning text-dark{% elif challenge.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %} px-2 py-1">
+                {{ challenge.get_status_display }}
+              </span>
+              <span class="badge bg-danger-subtle text-danger border border-danger px-2 py-1">
+                Priority: {{ challenge.get_priority_display }}
+              </span>
+            </div>
+
+            <div class="d-flex gap-2">
+              {% if user.is_authenticated %}
+                <a href="{% url 'challenges:toggle_bookmark' slug=challenge.slug %}" class="btn btn-sm {% if is_bookmarked %}btn-warning{% else %}btn-outline-secondary{% endif %}" title="Bookmark this challenge">
+                  <i class="bi {% if is_bookmarked %}bi-bookmark-fill{% else %}bi-bookmark{% endif %}"></i>
+                </a>
+              {% endif %}
+              <!-- Report Button triggers Modal -->
+              <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#reportModal" title="Report Inappropriate Challenge">
+                <i class="bi bi-flag"></i> Report
+              </button>
+            </div>
+          </div>
+
+          <h2 class="fw-bold text-dark mb-3">{{ challenge.title }}</h2>
+
+          <!-- Meta Bar -->
+          <div class="d-flex flex-wrap align-items-center gap-3 py-2 mb-4 border-top border-bottom small text-muted">
+            <span>
+              <i class="bi bi-person text-success me-1"></i>
+              Posted by <a href="{% url 'accounts:profile' username=challenge.creator.username %}" class="fw-semibold text-dark text-decoration-none">{{ challenge.creator.get_full_name|default:challenge.creator.username }}</a> ({{ challenge.creator.get_role_display }})
+            </span>
+            <span><i class="bi bi-clock me-1"></i> {{ challenge.creation_date|date:"M d, Y" }}</span>
+            <span><i class="bi bi-eye me-1"></i> {{ challenge.views_count }} views</span>
+          </div>
+
+          <!-- Location & Affected Community Badges -->
+          <div class="row g-3 mb-4">
+            <div class="col-sm-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="text-muted small fw-semibold text-uppercase"><i class="bi bi-geo-alt text-danger me-1"></i> Impact Location</div>
+                <div class="fw-bold text-dark">{{ challenge.location }}</div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="text-muted small fw-semibold text-uppercase"><i class="bi bi-people text-primary me-1"></i> Affected Community</div>
+                <div class="fw-bold text-dark">{{ challenge.affected_community }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <h5 class="fw-bold text-dark mb-2">Challenge Overview</h5>
+          <p class="text-secondary leading-relaxed mb-4" style="white-space: pre-line;">
+            {{ challenge.description }}
+          </p>
+
+          <!-- Edit / Delete for Creator or Administrator -->
+          {% if user == challenge.creator or user.is_administrator %}
+            <div class="d-flex gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_update' slug=challenge.slug %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-pencil-square me-1"></i> Edit Challenge
+              </a>
+              <a href="{% url 'challenges:challenge_delete' slug=challenge.slug %}" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash me-1"></i> Delete
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- AI Analysis Card -->
+      {% if challenge.ai_analysis_cache %}
+        <div class="card border-0 shadow-sm rounded-4 mb-4 ai-box p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-success mb-0">
+              <i class="bi bi-stars text-warning me-2"></i> AI Challenge Diagnosis & Insights
+            </h5>
+            <span class="badge bg-success text-white">AI Analyzed</span>
+          </div>
+
+          <!-- Root Causes -->
+          {% if challenge.ai_analysis_cache.potential_root_causes %}
+            <div class="mb-3">
+              <h6 class="fw-bold text-dark small text-uppercase mb-2">Potential Root Causes</h6>
+              <ul class="mb-0 small text-secondary">
+                {% for cause in challenge.ai_analysis_cache.potential_root_causes %}
+                  <li>{{ cause }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <!-- Affected Stakeholders -->
+          {% if challenge.ai_analysis_cache.affected_stakeholders %}
+            <div class="mb-3">
+              <h6 class="fw-bold text-dark small text-uppercase mb-2">Key Affected Stakeholders</h6>
+              <ul class="mb-0 small text-secondary">
+                {% for sh in challenge.ai_analysis_cache.affected_stakeholders %}
+                  <li>{{ sh }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <!-- Priority Rationale -->
+          {% if challenge.ai_analysis_cache.priority_explanation %}
+            <div class="p-3 bg-white rounded-3 border mb-3">
+              <div class="fw-bold small text-muted text-uppercase mb-1">
+                Suggested Priority: <span class="badge bg-danger">{{ challenge.ai_analysis_cache.suggested_priority|upper }}</span>
+              </div>
+              <p class="small text-secondary mb-0">{{ challenge.ai_analysis_cache.priority_explanation }}</p>
+            </div>
+          {% endif %}
+
+          <!-- Missing Information -->
+          {% if challenge.ai_analysis_cache.missing_information %}
+            <div class="mb-3">
+              <h6 class="fw-bold text-dark small text-uppercase mb-2">Questions / Missing Information for Better Solutions</h6>
+              <ul class="mb-0 small text-secondary">
+                {% for item in challenge.ai_analysis_cache.missing_information %}
+                  <li>{{ item }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+
+          <div class="text-muted small border-top pt-2" style="font-size: 0.75rem;">
+            <i class="bi bi-info-circle me-1"></i> {{ challenge.ai_analysis_cache.disclaimer }}
+          </div>
+        </div>
+      {% endif %}
+
+      <!-- Solution Proposals Section -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0">
+            <i class="bi bi-lightbulb text-warning me-2"></i> Solution Proposals ({{ proposals.count }})
+          </h5>
+          <a href="{% url 'solutions:proposal_create' challenge_slug=challenge.slug %}" class="btn btn-sm btn-success fw-semibold">
+            <i class="bi bi-plus-lg me-1"></i> Propose Solution
+          </a>
+        </div>
+
+        <div class="card-body p-4">
+          {% if proposals %}
+            <div class="d-flex flex-column gap-3">
+              {% for proposal in proposals %}
+                <div class="p-3 border rounded-3 bg-light hover-shadow">
+                  <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <h6 class="fw-bold mb-0">
+                      <a href="{% url 'solutions:proposal_detail' pk=proposal.pk %}" class="text-dark text-decoration-none">
+                        {{ proposal.title }}
+                      </a>
+                    </h6>
+                    <button class="btn btn-sm btn-outline-primary btn-upvote {% if request.user in proposal.votes.all %}active btn-primary text-white{% endif %}"
+                            data-proposal-id="{{ proposal.pk }}"
+                            data-vote-url="{% url 'solutions:toggle_vote' pk=proposal.pk %}">
+                      <i class="bi bi-hand-thumbs-up"></i>
+                      <span class="vote-count">{{ proposal.upvotes_count }}</span>
+                    </button>
+                  </div>
+
+                  <p class="small text-muted mb-2 text-truncate-3">{{ proposal.summary }}</p>
+
+                  <div class="d-flex flex-wrap justify-content-between align-items-center small text-secondary pt-2 border-top">
+                    <span>By <strong>{{ proposal.author.username }}</strong> &bull; {{ proposal.created_at|date:"M d" }}</span>
+                    <span><i class="bi bi-clock me-1"></i> {{ proposal.estimated_timeline }}</span>
+                    <a href="{% url 'solutions:proposal_detail' pk=proposal.pk %}" class="text-success text-decoration-none fw-semibold">
+                      Full Plan & Discussion <i class="bi bi-arrow-right"></i>
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4 text-muted">
+              <i class="bi bi-lightbulb fs-2 text-muted mb-2"></i>
+              <p>No solution proposals submitted yet. Be the first to draft a solution plan!</p>
+              <a href="{% url 'solutions:proposal_create' challenge_slug=challenge.slug %}" class="btn btn-outline-success btn-sm">
+                Submit a Solution Proposal
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Community Discussion Stream -->
+      <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-chat-dots text-primary me-2"></i> Community Discussion</h5>
+        </div>
+        <div class="card-body p-4">
+          <!-- Comment Form -->
+          {% if user.is_authenticated %}
+            <form action="{% url 'solutions:add_comment' %}" method="POST" class="mb-4">
+              {% csrf_token %}
+              <input type="hidden" name="challenge_id" value="{{ challenge.pk }}">
+              <div class="mb-2">
+                {{ comment_form.content }}
+              </div>
+              <button type="submit" class="btn btn-success btn-sm px-3 fw-semibold">Post Comment</button>
+            </form>
+          {% else %}
+            <div class="p-3 bg-light rounded-3 text-center mb-4 small text-muted">
+              Please <a href="{% url 'accounts:login' %}" class="text-success fw-semibold">log in</a> to participate in the discussion.
+            </div>
+          {% endif %}
+
+          <!-- Comments List -->
+          {% for c in comments %}
+            <div class="d-flex gap-3 mb-3 pb-3 border-bottom">
+              <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 36px; height: 36px; min-width: 36px;">
+                {{ c.author.username|make_list|first|upper }}
+              </div>
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <span class="fw-semibold small text-dark">{{ c.author.get_full_name|default:c.author.username }}</span>
+                  <span class="text-muted" style="font-size: 0.75rem;">{{ c.created_at|date:"M d, H:i" }}</span>
+                </div>
+                <div class="small text-secondary">{{ c.content }}</div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="text-center py-3 text-muted small">No comments yet. Start the conversation!</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar Column -->
+    <div class="col-lg-4">
+      <!-- AI Action Toolkit Box -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 ai-box">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="bg-success text-white rounded-3 p-2"><i class="bi bi-cpu-fill fs-5"></i></div>
+          <div>
+            <h5 class="fw-bold mb-0">AI Problem Solver</h5>
+            <div class="small text-muted">Mistral AI Assisted Toolkit</div>
+          </div>
+        </div>
+
+        <p class="small text-secondary mb-3">
+          Leverage AI to diagnose root causes, brainstorm 5 implementation roadmaps, or find relevant collaborators.
+        </p>
+
+        <div class="d-grid gap-2 mb-3">
+          <form action="{% url 'ai_services:analyze_challenge' challenge_id=challenge.pk %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold text-start d-flex justify-content-between align-items-center">
+              <span><i class="bi bi-clipboard-pulse me-2"></i> Run AI Diagnosis</span>
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </form>
+
+          <a href="{% url 'ai_services:generate_solutions' challenge_id=challenge.pk %}" class="btn btn-outline-success btn-sm fw-semibold text-start d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-lightbulb me-2"></i> Generate 5 AI Solutions</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+
+          <a href="{% url 'ai_services:similar_challenges' challenge_id=challenge.pk %}" class="btn btn-outline-primary btn-sm fw-semibold text-start d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-search me-2"></i> Find Similar Challenges</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+
+          <a href="{% url 'ai_services:team_matches' challenge_id=challenge.pk %}" class="btn btn-outline-dark btn-sm fw-semibold text-start d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-people me-2"></i> Smart Team Matching</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+        </div>
+
+        <div class="small text-muted" style="font-size: 0.75rem;">
+          <i class="bi bi-shield-check text-success me-1"></i> Safe & Transparent: AI outputs require local community validation.
+        </div>
+      </div>
+
+      <!-- Active Project Teams -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-people-fill text-success me-2"></i> Project Teams</h5>
+          <a href="{% url 'collaboration:team_create' challenge_slug=challenge.slug %}" class="btn btn-sm btn-outline-success">
+            + Form Team
+          </a>
+        </div>
+
+        {% if teams %}
+          <div class="d-flex flex-column gap-2">
+            {% for t in teams %}
+              <div class="p-3 bg-light rounded-3 border">
+                <div class="fw-bold">
+                  <a href="{% url 'collaboration:team_detail' pk=t.pk %}" class="text-dark text-decoration-none">
+                    {{ t.name }}
+                  </a>
+                </div>
+                <div class="small text-muted mb-2">Led by {{ t.created_by.username }} &bull; {{ t.memberships.count }} members</div>
+                <a href="{% url 'collaboration:team_detail' pk=t.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                  Open Workspace
+                </a>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-3 text-muted small">
+            No teams working on this yet.
+            <div class="mt-2">
+              <a href="{% url 'collaboration:team_create' challenge_slug=challenge.slug %}" class="btn btn-sm btn-success">
+                Start the First Team
+              </a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Institutional Sponsorship & Partnership -->
+      <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-buildings text-warning me-2"></i> Institutional Support</h5>
+        {% if challenge.sponsorship %}
+          <div class="p-3 bg-warning-subtle border border-warning rounded-3 mb-3">
+            <span class="badge bg-warning text-dark mb-1">Sponsored Challenge</span>
+            <h6 class="fw-bold mb-1">{{ challenge.sponsorship.currency }} {{ challenge.sponsorship.grant_amount }} Grant Offered</h6>
+            <div class="small text-secondary mb-2">By <strong>{{ challenge.sponsorship.sponsor.organization_name|default:challenge.sponsorship.sponsor.username }}</strong></div>
+            <p class="small text-dark mb-0">{{ challenge.sponsorship.benefits }}</p>
+          </div>
+        {% else %}
+          <p class="small text-muted mb-3">
+            Universities and companies can sponsor grants or provide lab resources for this challenge.
+          </p>
+          {% if user.is_organization %}
+            <div class="d-grid gap-2">
+              <a href="{% url 'partnerships:partnership_request' challenge_slug=challenge.slug %}" class="btn btn-outline-success btn-sm">
+                Request Official Partnership
+              </a>
+              <a href="{% url 'partnerships:sponsored_challenge_create' challenge_slug=challenge.slug %}" class="btn btn-outline-warning btn-sm">
+                Sponsor with Grant
+              </a>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- Impact Outcomes if resolved -->
+      {% if impact_reports %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-award text-success me-2"></i> Verified Impact</h5>
+          {% for r in impact_reports %}
+            <div class="p-3 bg-light rounded-3 border mb-2">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="badge {% if r.is_verified %}badge-verified{% else %}badge-self-reported{% endif %}">
+                  {% if r.is_verified %}Verified{% else %}Self-Reported{% endif %}
+                </span>
+                <span class="small text-muted">{{ r.beneficiaries_reached }} people reached</span>
+              </div>
+              <h6 class="fw-bold mb-1">
+                <a href="{% url 'impact:report_detail' pk=r.pk %}" class="text-dark text-decoration-none">
+                  {{ r.title }}
+                </a>
+              </h6>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Moderation Report Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1" aria-labelledby="reportModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 border-0">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold" id="reportModalLabel"><i class="bi bi-flag-fill text-danger me-2"></i> Report Challenge</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form action="{% url 'challenges:challenge_report' slug=challenge.slug %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-body p-4">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Reason for Report</label>
+            {{ report_form.reason }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Explanation Details</label>
+            {{ report_form.details }}
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-danger fw-semibold">Submit Report</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

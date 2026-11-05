@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Generated Solutions — {{ challenge.title }} — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'challenges:landing' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="text-decoration-none">{{ challenge.title|truncatechars:25 }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">AI Solution Roadmaps</li>
+    </ol>
+  </nav>
+
+  <!-- Header Banner -->
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 ai-box">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <h2 class="fw-bold mb-0"><i class="bi bi-stars text-warning me-2"></i> AI Solution Generator</h2>
+          {% if is_cached %}
+            <span class="badge bg-secondary">Cached Analysis</span>
+          {% else %}
+            <span class="badge bg-success">Live Mistral AI Output</span>
+          {% endif %}
+        </div>
+        <p class="text-muted small mb-0">
+          Brainstormed practical roadmaps for: <strong>{{ challenge.title }}</strong>
+        </p>
+      </div>
+
+      <div class="d-flex gap-2">
+        <a href="?refresh=1" class="btn btn-outline-success btn-sm">
+          <i class="bi bi-arrow-clockwise me-1"></i> Re-generate
+        </a>
+        <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-light btn-sm">
+          Back to Challenge
+        </a>
+      </div>
+    </div>
+
+    <!-- AI Ethics & Safety Disclaimer Banner -->
+    <div class="alert alert-info py-2 px-3 mt-3 mb-0 small rounded-3 border-info">
+      <i class="bi bi-info-circle-fill me-1"></i>
+      <strong>Notice:</strong> AI-generated suggestions are designed for preliminary brainstorming and inspiration. They may be inaccurate or unverified. Local human evaluation and technical validation are required before real-world implementation.
+    </div>
+  </div>
+
+  {% if error_message %}
+    <!-- Informative Alert when API key is missing or service unavailable -->
+    <div class="card border-warning shadow-sm rounded-4 p-4 mb-4 bg-warning-subtle text-dark">
+      <div class="d-flex gap-3 align-items-start">
+        <i class="bi bi-exclamation-triangle-fill fs-2 text-warning"></i>
+        <div>
+          <h5 class="fw-bold mb-2">AI Service Notice</h5>
+          <p class="mb-2">{{ error_message }}</p>
+          <div class="small text-secondary">
+            <strong>How to configure:</strong> Add your <code>MISTRAL_API_KEY=your_key_here</code> to the project's <code>.env</code> file and restart the Django development server.
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  {% if solutions_data and solutions_data.solutions %}
+    <div class="row g-4">
+      {% for sol in solutions_data.solutions %}
+        <div class="col-lg-6">
+          <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-success-subtle text-success border border-success fw-bold">
+                Idea #{{ forloop.counter }}
+              </span>
+              <a href="{% url 'solutions:proposal_create' challenge_slug=challenge.slug %}?prefill={{ sol.title|urlencode }}" class="btn btn-sm btn-outline-success">
+                <i class="bi bi-plus-circle me-1"></i> Adopt as Proposal
+              </a>
+            </div>
+
+            <h5 class="fw-bold text-dark mb-2">{{ sol.title }}</h5>
+            <p class="small text-secondary mb-3">{{ sol.summary }}</p>
+
+            <!-- Implementation Steps -->
+            <div class="mb-3">
+              <h6 class="fw-bold small text-muted text-uppercase mb-1"><i class="bi bi-list-ol me-1 text-primary"></i> Implementation Steps</h6>
+              <ol class="small text-secondary ps-3 mb-0">
+                {% for step in sol.implementation_steps %}
+                  <li>{{ step }}</li>
+                {% endfor %}
+              </ol>
+            </div>
+
+            <!-- Required Skills & Resources -->
+            <div class="mb-3">
+              <h6 class="fw-bold small text-muted text-uppercase mb-1"><i class="bi bi-tools me-1 text-warning"></i> Required Skills & Resources</h6>
+              <div class="d-flex flex-wrap gap-1">
+                {% for item in sol.required_skills_and_resources %}
+                  <span class="badge bg-light text-dark border">{{ item }}</span>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Potential Risks -->
+            <div class="mb-3">
+              <h6 class="fw-bold small text-muted text-uppercase mb-1"><i class="bi bi-shield-exclamation me-1 text-danger"></i> Potential Risks & Limitations</h6>
+              <ul class="small text-secondary ps-3 mb-0">
+                {% for risk in sol.potential_risks_and_limitations %}
+                  <li>{{ risk }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+
+            <!-- Suggested Collaborators & Impact Metrics -->
+            <div class="row g-2 pt-2 border-top mt-auto small text-muted">
+              <div class="col-12">
+                <strong>Possible Collaborators:</strong> {{ sol.possible_collaborators|join:", " }}
+              </div>
+              <div class="col-12">
+                <strong>Impact Metrics:</strong> {{ sol.suggested_impact_metrics|join:", " }}
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% elif not error_message %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-cpu fs-1 mb-2"></i>
+      <p>No solutions generated yet. Click "Re-generate" above to run the AI engine.</p>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

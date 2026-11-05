@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Societal Impact Dashboard — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold mb-0">Societal Impact Dashboard</h2>
+        <span class="badge bg-success-subtle text-success border border-success"><i class="bi bi-database-check me-1"></i> Live Database Metrics</span>
+      </div>
+      <p class="text-muted mb-0">Quantifiable social and environmental progress powered by collaborative action.</p>
+    </div>
+  </div>
+
+  <!-- Primary Metric Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Total Challenges</div>
+        <div class="fs-2 fw-bold text-success">{{ stats.total_challenges }}</div>
+        <span class="small text-muted">{{ stats.open_challenges }} currently open</span>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Resolved Challenges</div>
+        <div class="fs-2 fw-bold text-primary">{{ stats.resolved_challenges }}</div>
+        <span class="small text-muted">{{ stats.in_progress_challenges }} in implementation</span>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Active Teams</div>
+        <div class="fs-2 fw-bold text-warning">{{ stats.active_projects }}</div>
+        <span class="small text-muted">{{ stats.registered_collaborators }} collaborators</span>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Solutions Proposed</div>
+        <div class="fs-2 fw-bold text-info">{{ stats.solutions_proposed }}</div>
+        <span class="small text-muted">Community designs</span>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Milestones Done</div>
+        <div class="fs-2 fw-bold text-dark">{{ stats.completed_milestones }}</div>
+        <span class="small text-success fw-semibold">{{ stats.milestone_completion_rate }}% completion</span>
+      </div>
+    </div>
+
+    <div class="col-6 col-lg-2">
+      <div class="card p-3 border-0 bg-white shadow-sm h-100">
+        <div class="text-muted small fw-semibold text-uppercase">Beneficiaries</div>
+        <div class="fs-2 fw-bold text-success">{{ stats.total_beneficiaries }}</div>
+        <span class="small text-muted">Community reached</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verified vs Estimated Beneficiary Breakdown Notice -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light p-4 border">
+    <div class="row align-items-center g-3">
+      <div class="col-md-8">
+        <h5 class="fw-bold mb-1"><i class="bi bi-shield-check text-success me-2"></i> Transparent Impact Verification Standard</h5>
+        <p class="small text-secondary mb-0">
+          SocioSolve strictly separates <strong>Officially Audited & Verified Outcomes</strong> from <strong>Self-Reported Preliminary Estimates</strong> to ensure ethical data integrity.
+        </p>
+      </div>
+      <div class="col-md-4">
+        <div class="d-flex gap-3 justify-content-md-end">
+          <div class="text-center p-2 bg-white rounded border flex-fill">
+            <span class="badge badge-verified mb-1">Verified Audit</span>
+            <div class="fw-bold fs-5 text-primary">{{ stats.verified_beneficiaries }}</div>
+            <div class="small text-muted" style="font-size: 0.7rem;">People Served</div>
+          </div>
+          <div class="text-center p-2 bg-white rounded border flex-fill">
+            <span class="badge badge-self-reported mb-1">Self-Reported</span>
+            <div class="fw-bold fs-5 text-secondary">{{ stats.estimated_beneficiaries }}</div>
+            <div class="small text-muted" style="font-size: 0.7rem;">Estimated Impact</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Data Visualizations via Chart.js -->
+  <div class="row g-4 mb-4">
+    <!-- Chart 1: Categories Breakdown -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="bi bi-bar-chart-fill text-success me-2"></i> Challenges by Category</h5>
+        <div style="height: 280px; position: relative;">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Challenge Status Distribution -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="bi bi-pie-chart-fill text-primary me-2"></i> Challenge Statuses</h5>
+        <div style="height: 280px; position: relative;">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 3: Collaborators by Role -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+        <h5 class="fw-bold mb-3"><i class="bi bi-people-fill text-warning me-2"></i> Network Roles</h5>
+        <div style="height: 280px; position: relative;">
+          <canvas id="roleChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Impact Reports Table -->
+  <div class="card border-0 shadow-sm rounded-4">
+    <div class="card-header bg-white py-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-journal-check text-success me-2"></i> Published Societal Impact Reports</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if recent_reports %}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Report Title</th>
+                <th>Challenge</th>
+                <th>Verification</th>
+                <th>Beneficiaries</th>
+                <th>Reporter</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for report in recent_reports %}
+                <tr>
+                  <td class="fw-bold">
+                    <a href="{% url 'impact:report_detail' pk=report.pk %}" class="text-dark text-decoration-none">
+                      {{ report.title }}
+                    </a>
+                  </td>
+                  <td>{{ report.challenge.title|truncatechars:35 }}</td>
+                  <td>
+                    <span class="badge {% if report.is_verified %}badge-verified{% else %}badge-self-reported{% endif %}">
+                      {% if report.is_verified %}<i class="bi bi-patch-check-fill me-1"></i> Verified{% else %}Self-Reported{% endif %}
+                    </span>
+                  </td>
+                  <td><strong>{{ report.beneficiaries_reached }}</strong> citizens</td>
+                  <td>{{ report.reported_by.username }}</td>
+                  <td class="small">{{ report.created_at|date:"M d, Y" }}</td>
+                  <td>
+                    <a href="{% url 'impact:report_detail' pk=report.pk %}" class="btn btn-sm btn-outline-success">
+                      View Report
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="text-center py-5 text-muted">
+          <p>No impact reports published yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Chart.js Configuration Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // 1. Categories Bar Chart
+  const catCtx = document.getElementById('categoryChart').getContext('2d');
+  new Chart(catCtx, {
+    type: 'bar',
+    data: {
+      labels: {{ cat_labels_json|safe }},
+      datasets: [{
+        label: 'Approved Challenges',
+        data: {{ cat_data_json|safe }},
+        backgroundColor: '#198754',
+        borderRadius: 6,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, ticks: { precision: 0 } }
+      }
+    }
+  });
+
+  // 2. Status Doughnut Chart
+  const statusCtx = document.getElementById('statusChart').getContext('2d');
+  new Chart(statusCtx, {
+    type: 'doughnut',
+    data: {
+      labels: {{ status_labels_json|safe }},
+      datasets: [{
+        data: {{ status_data_json|safe }},
+        backgroundColor: ['#0d6efd', '#ffc107', '#198754', '#6c757d'],
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+      }
+    }
+  });
+
+  // 3. User Role Chart
+  const roleCtx = document.getElementById('roleChart').getContext('2d');
+  new Chart(roleCtx, {
+    type: 'polarArea',
+    data: {
+      labels: {{ role_labels_json|safe }},
+      datasets: [{
+        data: {{ role_data_json|safe }},
+        backgroundColor: ['#20c997', '#0dcaf0', '#6610f2', '#fd7e14', '#d63384', '#6c757d'],
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 9 } } }
+      }
+    }
+  });
+});
+</script>
+{% endblock %}

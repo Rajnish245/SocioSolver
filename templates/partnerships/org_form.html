@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Organization Profile — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <h4 class="fw-bold mb-0"><i class="bi bi-buildings text-success me-2"></i> Organization Profile</h4>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST">
+            {% csrf_token %}
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Official Registered Name</label>
+                {{ form.official_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Organization Type</label>
+                {{ form.org_type }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Headquarters / City</label>
+                {{ form.headquarters }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Established Year</label>
+                {{ form.established_year }}
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Mission Statement</label>
+                {{ form.mission_statement }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Focus Domains (Comma-separated)</label>
+                {{ form.focus_areas }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Website</label>
+                {{ form.website }}
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Available Resources & Support</label>
+                {{ form.resources_available }}
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'accounts:dashboard' %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold px-4">Save Organization Profile</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

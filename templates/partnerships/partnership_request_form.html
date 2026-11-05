@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Partnership — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <h4 class="fw-bold mb-0"><i class="bi bi-handshake text-success me-2"></i> Request Institutional Partnership</h4>
+        </div>
+        <div class="card-body p-4">
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <span class="badge bg-success-subtle text-success me-1">Challenge:</span>
+            <strong>{{ challenge.title }}</strong>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Offered Support / Resources</label>
+              {{ form.offered_support }}
+            </div>
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Partnership Message & Objectives</label>
+              {{ form.message }}
+            </div>
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold">Submit Partnership Request</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}Log In — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-success text-white text-center py-4">
+          <i class="bi bi-box-arrow-in-right fs-1"></i>
+          <h4 class="fw-bold mt-2 mb-0">Welcome Back</h4>
+          <p class="small text-white-50 mb-0">Log in to collaborate on SocioSolve</p>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Demo Accounts Quick Fill Buttons -->
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <div class="small fw-bold text-muted text-uppercase mb-2">
+              <i class="bi bi-magic text-warning me-1"></i> Quick Demo Login Fill:
+            </div>
+            <div class="d-flex flex-wrap gap-1">
+              <button type="button" class="btn btn-outline-success btn-sm demo-login-fill" data-user="maya_student">
+                Student
+              </button>
+              <button type="button" class="btn btn-outline-primary btn-sm demo-login-fill" data-user="dr_roberts">
+                University
+              </button>
+              <button type="button" class="btn btn-outline-warning btn-sm demo-login-fill" data-user="greentech_corp">
+                Company
+              </button>
+              <button type="button" class="btn btn-outline-info btn-sm demo-login-fill" data-user="cleanwater_ngo">
+                NGO
+              </button>
+              <button type="button" class="btn btn-outline-danger btn-sm demo-login-fill" data-user="admin">
+                Admin
+              </button>
+            </div>
+            <div class="text-muted mt-2" style="font-size: 0.75rem;">
+              Demo password: <code>SocioSolve2026!</code>
+            </div>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Username or Email</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                {{ form.username }}
+              </div>
+              {% if form.username.errors %}
+                <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                {{ form.password }}
+              </div>
+              {% if form.password.errors %}
+                <div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-success w-100 py-2 fw-semibold shadow-sm mb-3">
+              Log In to SocioSolve
+            </button>
+
+            <div class="text-center small text-muted">
+              Don't have an account? 
+              <a href="{% url 'accounts:register' %}" class="fw-semibold text-success text-decoration-none">Register here</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

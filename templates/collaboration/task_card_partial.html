@@ -1,0 +1,72 @@
+<div class="card p-2 mb-2 bg-white shadow-sm border rounded-3">
+  <div class="d-flex justify-content-between align-items-start gap-1 mb-1">
+    <span class="fw-semibold small text-dark">{{ task.title }}</span>
+    <span class="badge {% if task.priority == 'high' or task.priority == 'urgent' %}bg-danger{% elif task.priority == 'medium' %}bg-warning text-dark{% else %}bg-secondary{% endif %}" style="font-size: 0.65rem;">
+      {{ task.get_priority_display }}
+    </span>
+  </div>
+  {% if task.description %}
+    <p class="text-muted mb-2" style="font-size: 0.75rem;">{{ task.description|truncatechars:65 }}</p>
+  {% endif %}
+  <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size: 0.7rem;">
+    <span class="text-secondary">
+      <i class="bi bi-person me-1"></i> {{ task.assigned_to.username|default:"Unassigned" }}
+    </span>
+    {% if is_member or is_lead or user.is_administrator %}
+      <!-- Dropdown status changer -->
+      <div class="dropdown">
+        <button class="btn btn-sm btn-light py-0 px-1 border" type="button" data-bs-toggle="dropdown" style="font-size: 0.7rem;">
+          <i class="bi bi-three-dots"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="font-size: 0.8rem;">
+          <li><h6 class="dropdown-header">Move Status</h6></li>
+          {% if task.status != 'todo' %}
+            <li>
+              <form action="{% url 'collaboration:task_update_status' pk=task.team.pk task_id=task.id %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="todo">
+                <button type="submit" class="dropdown-item">Move to To Do</button>
+              </form>
+            </li>
+          {% endif %}
+          {% if task.status != 'in_progress' %}
+            <li>
+              <form action="{% url 'collaboration:task_update_status' pk=task.team.pk task_id=task.id %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="in_progress">
+                <button type="submit" class="dropdown-item text-warning">Move to In Progress</button>
+              </form>
+            </li>
+          {% endif %}
+          {% if task.status != 'in_review' %}
+            <li>
+              <form action="{% url 'collaboration:task_update_status' pk=task.team.pk task_id=task.id %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="in_review">
+                <button type="submit" class="dropdown-item text-info">Move to In Review</button>
+              </form>
+            </li>
+          {% endif %}
+          {% if task.status != 'done' %}
+            <li>
+              <form action="{% url 'collaboration:task_update_status' pk=task.team.pk task_id=task.id %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="status" value="done">
+                <button type="submit" class="dropdown-item text-success">Mark Completed</button>
+              </form>
+            </li>
+          {% endif %}
+          {% if is_lead or task.created_by == user or user.is_administrator %}
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form action="{% url 'collaboration:task_delete' pk=task.team.pk task_id=task.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">Delete Task</button>
+              </form>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    {% endif %}
+  </div>
+</div>

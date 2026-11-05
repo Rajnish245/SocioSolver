@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ report.title }} — Impact Report — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-9">
+      <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="badge {% if report.is_verified %}badge-verified{% else %}badge-self-reported{% endif %} px-3 py-2 fs-6">
+            {% if report.is_verified %}<i class="bi bi-patch-check-fill me-1"></i> Officially Audited & Verified{% else %}<i class="bi bi-pencil-square me-1"></i> Self-Reported Community Outcome{% endif %}
+          </span>
+          <span class="text-muted small">{{ report.created_at|date:"F d, Y" }}</span>
+        </div>
+
+        <h2 class="fw-bold mb-3">{{ report.title }}</h2>
+
+        <div class="p-3 bg-light rounded-3 border mb-4">
+          <div class="small text-muted text-uppercase fw-semibold mb-1">Target Societal Challenge:</div>
+          <h5 class="fw-bold mb-0">
+            <a href="{% url 'challenges:challenge_detail' slug=report.challenge.slug %}" class="text-dark text-decoration-none">
+              {{ report.challenge.title }}
+            </a>
+          </h5>
+        </div>
+
+        <!-- Metric Highlight -->
+        <div class="p-4 bg-success-subtle text-success-emphasis rounded-4 border border-success mb-4 text-center">
+          <div class="fs-1 fw-bold">{{ report.beneficiaries_reached }}</div>
+          <div class="fw-semibold text-uppercase small">Direct Beneficiaries Reached</div>
+        </div>
+
+        <h5 class="fw-bold text-dark mb-2">Executive Summary</h5>
+        <p class="text-secondary leading-relaxed mb-4" style="white-space: pre-line;">
+          {{ report.summary }}
+        </p>
+
+        {% if report.environmental_impact %}
+          <h5 class="fw-bold text-dark mb-2">Environmental Outcomes</h5>
+          <div class="p-3 bg-light rounded-3 border mb-4 text-secondary" style="white-space: pre-line;">
+            {{ report.environmental_impact }}
+          </div>
+        {% endif %}
+
+        {% if report.social_impact %}
+          <h5 class="fw-bold text-dark mb-2">Social & Community Impact</h5>
+          <div class="p-3 bg-light rounded-3 border mb-4 text-secondary" style="white-space: pre-line;">
+            {{ report.social_impact }}
+          </div>
+        {% endif %}
+
+        {% if report.challenges_overcome %}
+          <h5 class="fw-bold text-dark mb-2">Challenges Overcome & Lessons Learned</h5>
+          <div class="p-3 bg-light rounded-3 border mb-4 text-secondary" style="white-space: pre-line;">
+            {{ report.challenges_overcome }}
+          </div>
+        {% endif %}
+
+        {% if report.future_sustainability_plan %}
+          <h5 class="fw-bold text-dark mb-2">Sustainability & Handover Roadmap</h5>
+          <div class="p-3 bg-light rounded-3 border mb-4 text-secondary" style="white-space: pre-line;">
+            {{ report.future_sustainability_plan }}
+          </div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center pt-3 border-top small text-muted">
+          <span>Submitted by <strong>{{ report.reported_by.username }}</strong></span>
+          <a href="{% url 'impact:dashboard' %}" class="btn btn-outline-success btn-sm">
+            <i class="bi bi-arrow-left me-1"></i> Back to Impact Dashboard
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

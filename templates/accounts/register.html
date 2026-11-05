@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Account — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-success text-white py-4 text-center">
+          <i class="bi bi-person-plus fs-1"></i>
+          <h3 class="fw-bold mt-2 mb-1">Create Your SocioSolve Account</h3>
+          <p class="small text-white-50 mb-0">Join our collaborative network for real societal problem solving</p>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form method="POST">
+            {% csrf_token %}
+
+            <h5 class="fw-bold text-success mb-3 pb-2 border-bottom">
+              <i class="bi bi-person-badge me-1"></i> Account Credentials
+            </h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+                {{ form.username }}
+                {% if form.username.errors %}<div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                {{ form.email }}
+                {% if form.email.errors %}<div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                {{ form.password }}
+                {% if form.password.errors %}<div class="text-danger small mt-1">{{ form.password.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                {{ form.confirm_password }}
+                {% if form.confirm_password.errors %}<div class="text-danger small mt-1">{{ form.confirm_password.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <h5 class="fw-bold text-success mb-3 pb-2 border-bottom">
+              <i class="bi bi-briefcase me-1"></i> Role & Affiliation
+            </h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Your Role in SocioSolve <span class="text-danger">*</span></label>
+                {{ form.role }}
+                <div class="form-text small">Select your primary role (Citizen, Student, University, Company, NGO).</div>
+                {% if form.role.errors %}<div class="text-danger small mt-1">{{ form.role.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Organization / University Name</label>
+                {{ form.organization_name }}
+                <div class="form-text small">e.g. Cambridge Global Lab, MIT, Austin Action Board</div>
+                {% if form.organization_name.errors %}<div class="text-danger small mt-1">{{ form.organization_name.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">First Name</label>
+                {{ form.first_name }}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Last Name</label>
+                {{ form.last_name }}
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Location</label>
+                {{ form.location }}
+              </div>
+            </div>
+
+            <h5 class="fw-bold text-success mb-3 pb-2 border-bottom">
+              <i class="bi bi-tags me-1"></i> Skills & Interests (For Smart AI Team Matching)
+            </h5>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Skills</label>
+                {{ form.skills }}
+                <div class="form-text small">Comma-separated (e.g., Python, Water Purification, IoT, Public Policy).</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Interests & Focus Domains</label>
+                {{ form.interests }}
+                <div class="form-text small">Comma-separated (e.g., Clean Water, Solar Microgrids, STEM).</div>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100 py-3 fw-bold shadow-sm mb-3">
+              Create My SocioSolve Account
+            </button>
+
+            <div class="text-center small text-muted">
+              Already have an account? 
+              <a href="{% url 'accounts:login' %}" class="fw-semibold text-success text-decoration-none">Log in here</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

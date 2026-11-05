@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Similar Challenges — {{ challenge.title }} — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'challenges:landing' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="text-decoration-none">{{ challenge.title|truncatechars:25 }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Similar Challenges</li>
+    </ol>
+  </nav>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-search text-primary me-2"></i> Related & Similar Challenges</h3>
+        <p class="text-muted small mb-0">Finding past initiatives to avoid reinventing the wheel and encourage cross-pollination.</p>
+      </div>
+      <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-secondary btn-sm">
+        Back to Challenge
+      </a>
+    </div>
+
+    <!-- Active Search Engine Indicator -->
+    <div class="p-3 bg-light rounded-3 border mt-3">
+      <div class="d-flex align-items-center justify-content-between">
+        <div>
+          <span class="small fw-bold text-uppercase text-muted">Active Search Algorithm:</span>
+          <span class="badge {% if 'Semantic' in search_method %}bg-success{% else %}bg-secondary{% endif %} ms-2">
+            {{ search_method }}
+          </span>
+        </div>
+      </div>
+      <div class="small text-secondary mt-1">{{ search_explanation }}</div>
+    </div>
+  </div>
+
+  <!-- Results List -->
+  <div class="row g-4">
+    {% for item in similar_challenges %}
+      <div class="col-md-6">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="badge bg-success-subtle text-success border border-success">
+              {{ item.challenge.category.name }}
+            </span>
+            <div class="text-end">
+              <span class="badge bg-primary-subtle text-primary border border-primary">
+                {{ item.similarity_percent }}% Relevance Match
+              </span>
+            </div>
+          </div>
+
+          <h5 class="fw-bold mb-2">
+            <a href="{% url 'challenges:challenge_detail' slug=item.challenge.slug %}" class="text-dark text-decoration-none">
+              {{ item.challenge.title }}
+            </a>
+          </h5>
+
+          <p class="small text-muted flex-grow-1 text-truncate-3 mb-3">
+            {{ item.challenge.description }}
+          </p>
+
+          <div class="small text-secondary mb-3 pt-2 border-top">
+            <i class="bi bi-geo-alt me-1 text-danger"></i> {{ item.challenge.location }} &bull;
+            <span>Status: <strong>{{ item.challenge.get_status_display }}</strong></span>
+          </div>
+
+          <a href="{% url 'challenges:challenge_detail' slug=item.challenge.slug %}" class="btn btn-outline-success btn-sm w-100">
+            View This Challenge & Team Progress <i class="bi bi-arrow-right ms-1"></i>
+          </a>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5 text-muted">
+        <p>No similar challenges found in the database.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

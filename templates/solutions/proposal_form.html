@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Solution Proposal — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold mb-0">
+              <i class="bi bi-lightbulb text-warning me-2"></i> {{ action }} Solution Proposal
+            </h4>
+            <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Reference Challenge Banner -->
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <span class="badge bg-success-subtle text-success me-2">For Challenge:</span>
+            <strong class="text-dark">{{ challenge.title }}</strong>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Solution Title <span class="text-danger">*</span></label>
+              {{ form.title }}
+              {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Executive Summary <span class="text-danger">*</span></label>
+              {{ form.summary }}
+              {% if form.summary.errors %}<div class="text-danger small mt-1">{{ form.summary.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Detailed Implementation Roadmap <span class="text-danger">*</span></label>
+              {{ form.detailed_plan }}
+              {% if form.detailed_plan.errors %}<div class="text-danger small mt-1">{{ form.detailed_plan.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Required Equipment, Skills & Resources <span class="text-danger">*</span></label>
+              {{ form.resources_needed }}
+              {% if form.resources_needed.errors %}<div class="text-danger small mt-1">{{ form.resources_needed.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Estimated Timeline <span class="text-danger">*</span></label>
+                {{ form.estimated_timeline }}
+                {% if form.estimated_timeline.errors %}<div class="text-danger small mt-1">{{ form.estimated_timeline.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Estimated Budget (Optional)</label>
+                {{ form.estimated_budget }}
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold px-4">
+                {{ action }} Solution Proposal
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

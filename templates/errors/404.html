@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found (404) — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-5 text-center">
+  <div class="py-5" style="max-width: 600px; margin: 0 auto;">
+    <div class="display-1 fw-bold text-success mb-2">404</div>
+    <h3 class="fw-bold mb-3">Page or Challenge Not Found</h3>
+    <p class="text-muted mb-4">
+      The societal challenge, proposal, or page you are looking for might have been removed, had its name changed, or is temporarily unavailable.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{% url 'challenges:landing' %}" class="btn btn-success fw-semibold">Back to Home</a>
+      <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-secondary">Browse Challenges</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

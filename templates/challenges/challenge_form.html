@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ action }} Challenge — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold mb-0">
+              <i class="bi bi-pencil-square text-success me-2"></i> {{ action }} Societal Challenge
+            </h4>
+            <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <div class="small fw-bold text-success mb-1">
+              <i class="bi bi-lightbulb me-1"></i> Best Practices for Challenge Submissions:
+            </div>
+            <ul class="small text-muted mb-0 ps-3">
+              <li>Clearly describe the problem location, who is impacted, and the frequency of occurrence.</li>
+              <li>Once submitted, you can run AI analysis to auto-diagnose root causes and generate practical solutions.</li>
+            </ul>
+          </div>
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Challenge Title <span class="text-danger">*</span></label>
+              {{ form.title }}
+              <div class="form-text small">Concise, impactful title summarizing the issue.</div>
+              {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                {{ form.category }}
+                {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Initial Priority Assessment</label>
+                {{ form.priority }}
+                {% if form.priority.errors %}<div class="text-danger small mt-1">{{ form.priority.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Geographic Location / Campus Area <span class="text-danger">*</span></label>
+                {{ form.location }}
+                {% if form.location.errors %}<div class="text-danger small mt-1">{{ form.location.errors.0 }}</div>{% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Affected Community <span class="text-danger">*</span></label>
+                {{ form.affected_community }}
+                {% if form.affected_community.errors %}<div class="text-danger small mt-1">{{ form.affected_community.errors.0 }}</div>{% endif %}
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Detailed Description <span class="text-danger">*</span></label>
+              {{ form.description }}
+              <div class="form-text small">At least 20 characters describing the problem context, severity, and background.</div>
+              {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Problem Photo (Optional, Max 5MB)</label>
+              {{ form.problem_image }}
+              <div class="form-text small">Upload JPG, PNG, or WEBP photo documenting the issue.</div>
+              {% if form.problem_image.errors %}<div class="text-danger small mt-1">{{ form.problem_image.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_list' %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold px-4">
+                {{ action }} Challenge
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

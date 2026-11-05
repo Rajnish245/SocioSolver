@@ -1,0 +1,121 @@
+/* SocioSolve Custom Theme & Polish */
+:root {
+    --primary: #198754;
+    --primary-dark: #146c43;
+    --primary-light: #d1e7dd;
+    --secondary: #0d6efd;
+    --accent: #fd7e14;
+    --dark: #1e293b;
+    --light-bg: #f8fafc;
+    --border-color: #e2e8f0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: var(--light-bg);
+    color: #334155;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Navbar */
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+.brand-badge {
+    font-size: 0.65rem;
+    vertical-align: middle;
+    letter-spacing: 0.5px;
+}
+
+/* Cards */
+.card {
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid var(--border-color);
+    font-weight: 600;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+    color: white;
+    padding: 4.5rem 0 3.5rem;
+}
+.hero-title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1.15;
+}
+
+/* Badges */
+.badge-verified {
+    background-color: #0d6efd;
+    color: white;
+}
+.badge-self-reported {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Kanban task column */
+.kanban-col {
+    background-color: #f1f5f9;
+    border-radius: 0.75rem;
+    padding: 1rem;
+    min-height: 250px;
+}
+
+/* AI Highlight Box */
+.ai-box {
+    background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%);
+    border: 1px solid #bbf7d0;
+    border-radius: 0.75rem;
+}
+
+/* Upvote button */
+.btn-upvote {
+    transition: all 0.2s ease;
+}
+.btn-upvote.active {
+    background-color: #0d6efd;
+    color: white;
+    border-color: #0d6efd;
+}
+
+/* Footer */
+footer {
+    background-color: #0f172a;
+    color: #94a3b8;
+    margin-top: auto;
+}
+footer a {
+    color: #cbd5e1;
+    text-decoration: none;
+}
+footer a:hover {
+    color: #38bdf8;
+    text-decoration: underline;
+}
+
+/* Truncate multi-line */
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}

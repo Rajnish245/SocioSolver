@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Challenges — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <h2 class="fw-bold mb-1">Societal Challenges Directory</h2>
+      <p class="text-muted mb-0">Browse real community problems submitted by citizens, students, and organizations.</p>
+    </div>
+    <div class="mt-3 mt-md-0">
+      <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success fw-semibold shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Report a Challenge
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Filters Sidebar -->
+    <div class="col-lg-3">
+      <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+        <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-1 text-success"></i> Filter Challenges</h5>
+        <form method="GET" action="{% url 'challenges:challenge_list' %}">
+          <!-- Keyword Search -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Keyword</label>
+            <div class="input-group">
+              <input type="text" name="q" value="{{ q }}" class="form-control form-control-sm" placeholder="Search keywords...">
+              {% if q %}
+                <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x"></i></a>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Status Filter -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Status</label>
+            <select name="status" class="form-select form-select-sm">
+              <option value="">All Statuses</option>
+              {% for val, label in statuses %}
+                <option value="{{ val }}" {% if status_filter == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Priority Filter -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Priority</label>
+            <select name="priority" class="form-select form-select-sm">
+              <option value="">All Priorities</option>
+              {% for val, label in priorities %}
+                <option value="{{ val }}" {% if priority_filter == val %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <!-- Sort Order -->
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-muted">Sort By</label>
+            <select name="sort" class="form-select form-select-sm">
+              <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+              <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Viewed</option>
+              <option value="most_solutions" {% if sort_by == 'most_solutions' %}selected{% endif %}>Most Solutions</option>
+              <option value="most_discussed" {% if sort_by == 'most_discussed' %}selected{% endif %}>Most Discussed</option>
+            </select>
+          </div>
+
+          {% if selected_category %}
+            <input type="hidden" name="category" value="{{ selected_category.slug }}">
+          {% endif %}
+
+          <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold mb-2">Apply Filters</button>
+          <a href="{% url 'challenges:challenge_list' %}" class="btn btn-light btn-sm w-100 text-muted">Reset Filters</a>
+        </form>
+      </div>
+
+      <!-- Categories Navigation -->
+      <div class="card border-0 shadow-sm rounded-4 p-3">
+        <h6 class="fw-bold text-muted small text-uppercase mb-2">Categories</h6>
+        <div class="list-group list-group-flush small">
+          <a href="{% url 'challenges:challenge_list' %}{% if q %}?q={{ q }}{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-2 py-2 border-0 {% if not selected_category %}fw-bold text-success{% endif %}">
+            <span>All Categories</span>
+          </a>
+          {% for cat in categories %}
+            <a href="{% url 'challenges:challenge_list' %}?category={{ cat.slug }}{% if q %}&q={{ q }}{% endif %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center px-2 py-2 border-0 {% if selected_category.slug == cat.slug %}fw-bold text-success bg-light rounded{% endif %}">
+              <span><i class="bi {{ cat.icon_class }} me-1 text-secondary"></i> {{ cat.name }}</span>
+              <span class="badge bg-light text-muted">{{ cat.c_count }}</span>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenges Grid -->
+    <div class="col-lg-9">
+      <!-- Active filter tags -->
+      {% if q or selected_category or status_filter or priority_filter %}
+        <div class="d-flex flex-wrap gap-2 align-items-center mb-3 p-2 bg-white rounded-3 border">
+          <span class="small fw-semibold text-muted">Active Filters:</span>
+          {% if q %}<span class="badge bg-secondary">Query: "{{ q }}"</span>{% endif %}
+          {% if selected_category %}<span class="badge bg-success">Category: {{ selected_category.name }}</span>{% endif %}
+          {% if status_filter %}<span class="badge bg-primary">Status: {{ status_filter }}</span>{% endif %}
+          {% if priority_filter %}<span class="badge bg-warning text-dark">Priority: {{ priority_filter }}</span>{% endif %}
+          <a href="{% url 'challenges:challenge_list' %}" class="small text-danger text-decoration-none ms-auto">Clear All</a>
+        </div>
+      {% endif %}
+
+      <div class="row g-4">
+        {% for challenge in page_obj %}
+          <div class="col-md-6">
+            <div class="card h-100 shadow-sm border rounded-4 d-flex flex-column">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span class="badge bg-success-subtle text-success border border-success">
+                    <i class="bi {{ challenge.category.icon_class }} me-1"></i> {{ challenge.category.name }}
+                  </span>
+                  <span class="badge {% if challenge.status == 'open' %}bg-primary{% elif challenge.status == 'in_progress' %}bg-warning text-dark{% elif challenge.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                    {{ challenge.get_status_display }}
+                  </span>
+                </div>
+
+                <h5 class="fw-bold mb-2">
+                  <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="text-dark text-decoration-none">
+                    {{ challenge.title }}
+                  </a>
+                </h5>
+
+                <p class="text-muted small text-truncate-3 flex-grow-1 mb-3">
+                  {{ challenge.description }}
+                </p>
+
+                <div class="small text-secondary mb-2">
+                  <i class="bi bi-geo-alt text-danger me-1"></i> {{ challenge.location }}
+                </div>
+                <div class="small text-secondary mb-3">
+                  <i class="bi bi-people text-primary me-1"></i> {{ challenge.affected_community|truncatechars:35 }}
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top small text-muted">
+                  <span>By <strong>{{ challenge.creator.username }}</strong></span>
+                  <div class="d-flex gap-2">
+                    <span><i class="bi bi-eye me-1"></i>{{ challenge.views_count }}</span>
+                    <span><i class="bi bi-lightbulb me-1"></i>{{ challenge.proposals_total }}</span>
+                    <span><i class="bi bi-chat-text me-1"></i>{{ challenge.comments_total }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card-footer bg-white border-0 pt-0 pb-3">
+                <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-success btn-sm w-100">
+                  View Challenge Details <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <div class="col-12 text-center py-5">
+            <div class="p-5 bg-white rounded-4 border">
+              <i class="bi bi-search text-muted fs-1 mb-3"></i>
+              <h4>No challenges matched your search criteria</h4>
+              <p class="text-muted">Try clearing filters or search for another issue.</p>
+              <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-success">View All Challenges</a>
+              <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success ms-2">Post a Challenge</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if page_obj.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Previous</span></li>
+            {% endif %}
+
+            {% for p in page_obj.paginator.page_range %}
+              {% if page_obj.number == p %}
+                <li class="page-item active"><span class="page-link">{{ p }}</span></li>
+              {% else %}
+                <li class="page-item">
+                  <a class="page-link" href="?page={{ p }}{% if q %}&q={{ q }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ p }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_category %}&category={{ selected_category.slug }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if priority_filter %}&priority={{ priority_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+              </li>
+            {% else %}
+              <li class="page-item disabled"><span class="page-link">Next</span></li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

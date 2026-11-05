@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block title %}Publish Impact Report — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <h4 class="fw-bold mb-0"><i class="bi bi-award text-success me-2"></i> Publish Societal Impact Report</h4>
+        </div>
+        <div class="card-body p-4">
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <span class="badge bg-success-subtle text-success me-1">Reporting on Challenge:</span>
+            <strong>{{ challenge.title }}</strong>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Report Title <span class="text-danger">*</span></label>
+              {{ form.title }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Executive Summary of Outcomes <span class="text-danger">*</span></label>
+              {{ form.summary }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Direct Beneficiaries Reached (Count) <span class="text-danger">*</span></label>
+              {{ form.beneficiaries_reached }}
+              <div class="form-text small">Number of students, residents, or community members directly aided.</div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Environmental Outcomes (Conserved resources, emissions, etc.)</label>
+              {{ form.environmental_impact }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Social & Educational Outcomes (Awareness, training, equity)</label>
+              {{ form.social_impact }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Implementation Challenges Overcome</label>
+              {{ form.challenges_overcome }}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Future Sustainability Plan</label>
+              {{ form.future_sustainability_plan }}
+            </div>
+
+            <div class="form-check p-3 bg-light rounded-3 border mb-4">
+              <input class="form-check-input ms-0 me-2" type="checkbox" name="mark_resolved" value="1" id="markResolvedCheck" checked>
+              <label class="form-check-label fw-semibold" for="markResolvedCheck">
+                Mark Challenge Status as "Resolved & Implemented"
+              </label>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold px-4">Publish Impact Report</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

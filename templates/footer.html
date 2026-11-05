@@ -1,0 +1,56 @@
+<footer class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <h5 class="text-white fw-bold d-flex align-items-center mb-3">
+          <i class="bi bi-globe-americas text-success me-2"></i> SocioSolve
+        </h5>
+        <p class="small text-secondary mb-3">
+          An open, collaborative, AI-augmented platform connecting citizens, students, universities, NGOs, and enterprises to solve real-world community challenges with measurable impact.
+        </p>
+        <div class="d-flex gap-2">
+          <span class="badge bg-dark border text-light"><i class="bi bi-cpu text-info me-1"></i> Mistral AI</span>
+          <span class="badge bg-dark border text-light"><i class="bi bi-filetype-py text-warning me-1"></i> Django 5.1</span>
+          <span class="badge bg-dark border text-light"><i class="bi bi-bootstrap text-primary me-1"></i> Bootstrap 5</span>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-2 offset-lg-1">
+        <h6 class="text-white fw-semibold mb-3">Platform</h6>
+        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+          <li><a href="{% url 'challenges:challenge_list' %}">Explore Challenges</a></li>
+          <li><a href="{% url 'impact:dashboard' %}">Impact Dashboard</a></li>
+          <li><a href="{% url 'partnerships:org_list' %}">Partner Institutions</a></li>
+          <li><a href="{% url 'challenges:challenge_create' %}">Post a Challenge</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-lg-2">
+        <h6 class="text-white fw-semibold mb-3">User Roles</h6>
+        <ul class="list-unstyled small mb-0 d-flex flex-column gap-2">
+          <li><span class="text-secondary">Citizens</span></li>
+          <li><span class="text-secondary">Students</span></li>
+          <li><span class="text-secondary">Universities</span></li>
+          <li><span class="text-secondary">Companies & NGOs</span></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3">
+        <h6 class="text-white fw-semibold mb-3">AI Transparency & Safety</h6>
+        <p class="small text-secondary mb-0">
+          <i class="bi bi-info-circle text-info me-1"></i>
+          AI-generated suggestions, priority ratings, and solution roadmaps are intended as brainstorming aids and require human evaluation before implementation.
+        </p>
+      </div>
+    </div>
+
+    <hr class="border-secondary my-4">
+
+    <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center small text-secondary">
+      <div>&copy; 2026 SocioSolve Platform. Built for open societal innovation.</div>
+      <div class="mt-2 mt-sm-0">
+        <span class="text-success"><i class="bi bi-circle-fill me-1" style="font-size: 0.5rem;"></i> System Operational</span>
+      </div>
+    </div>
+  </div>
+</footer>

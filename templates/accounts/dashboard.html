@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dashboard — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Header & User Role Badge -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center pb-3 mb-4 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h2 class="fw-bold mb-0">Dashboard</h2>
+        <span class="badge bg-success-subtle text-success border border-success">{{ user.get_role_display }}</span>
+      </div>
+      <p class="text-muted mb-0">Welcome back, <strong>{{ user.first_name|default:user.username }}</strong>! Track your challenges, project tasks, and collaborative teams.</p>
+    </div>
+    <div class="mt-3 mt-md-0 d-flex gap-2">
+      <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle me-1"></i> Post Challenge
+      </a>
+      <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-search me-1"></i> Browse All
+      </a>
+    </div>
+  </div>
+
+  <!-- Metric Summary Cards -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card p-3 border-0 bg-white shadow-sm">
+        <div class="text-muted small fw-semibold text-uppercase">My Challenges</div>
+        <div class="fs-3 fw-bold text-success">{{ stats.challenges_count }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 border-0 bg-white shadow-sm">
+        <div class="text-muted small fw-semibold text-uppercase">Proposals Submitted</div>
+        <div class="fs-3 fw-bold text-primary">{{ stats.proposals_count }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 border-0 bg-white shadow-sm">
+        <div class="text-muted small fw-semibold text-uppercase">Active Teams</div>
+        <div class="fs-3 fw-bold text-warning">{{ stats.teams_count }}</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card p-3 border-0 bg-white shadow-sm">
+        <div class="text-muted small fw-semibold text-uppercase">Pending Tasks</div>
+        <div class="fs-3 fw-bold text-danger">{{ stats.pending_tasks_count }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Tabs -->
+  <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active fw-semibold" id="tasks-tab" data-bs-toggle="tab" data-bs-target="#tasks-tab-pane" type="button" role="tab">
+        <i class="bi bi-check2-square me-1"></i> My Tasks ({{ my_tasks.count }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="challenges-tab" data-bs-toggle="tab" data-bs-target="#challenges-tab-pane" type="button" role="tab">
+        <i class="bi bi-flag me-1"></i> My Challenges ({{ my_challenges.count }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="proposals-tab" data-bs-toggle="tab" data-bs-target="#proposals-tab-pane" type="button" role="tab">
+        <i class="bi bi-lightbulb me-1"></i> My Proposals ({{ my_proposals.count }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="teams-tab" data-bs-toggle="tab" data-bs-target="#teams-tab-pane" type="button" role="tab">
+        <i class="bi bi-people me-1"></i> My Teams ({{ my_team_memberships.count }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link fw-semibold" id="bookmarks-tab" data-bs-toggle="tab" data-bs-target="#bookmarks-tab-pane" type="button" role="tab">
+        <i class="bi bi-bookmark me-1"></i> Bookmarks ({{ bookmarked_challenges.count }})
+      </button>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  <div class="tab-content" id="dashboardTabsContent">
+    <!-- Tasks Tab -->
+    <div class="tab-pane fade show active" id="tasks-tab-pane" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if my_tasks %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Task</th>
+                    <th>Team / Project</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for task in my_tasks %}
+                    <tr>
+                      <td class="fw-semibold">{{ task.title }}</td>
+                      <td>
+                        <a href="{% url 'collaboration:team_detail' pk=task.team.pk %}" class="text-decoration-none">
+                          {{ task.team.name }}
+                        </a>
+                      </td>
+                      <td>
+                        <span class="badge {% if task.status == 'done' %}bg-success{% elif task.status == 'in_progress' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                          {{ task.get_status_display }}
+                        </span>
+                      </td>
+                      <td>
+                        <span class="badge bg-light text-dark border">{{ task.get_priority_display }}</span>
+                      </td>
+                      <td class="small">{{ task.due_date|default:"No deadline" }}</td>
+                      <td>
+                        <form action="{% url 'collaboration:task_update_status' pk=task.team.pk task_id=task.id %}" method="POST" class="d-inline">
+                          {% csrf_token %}
+                          {% if task.status != 'done' %}
+                            <input type="hidden" name="status" value="done">
+                            <button type="submit" class="btn btn-sm btn-outline-success">
+                              <i class="bi bi-check-lg"></i> Mark Done
+                            </button>
+                          {% else %}
+                            <input type="hidden" name="status" value="todo">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                              <i class="bi bi-arrow-counterclockwise"></i> Reopen
+                            </button>
+                          {% endif %}
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-check2-circle text-muted fs-1 mb-2"></i>
+              <p class="text-muted">You have no tasks assigned to you right now.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Challenges Tab -->
+    <div class="tab-pane fade" id="challenges-tab-pane" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if my_challenges %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Challenge</th>
+                    <th>Category</th>
+                    <th>Status</th>
+                    <th>Views</th>
+                    <th>Solutions</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in my_challenges %}
+                    <tr>
+                      <td class="fw-semibold">
+                        <a href="{% url 'challenges:challenge_detail' slug=c.slug %}" class="text-dark text-decoration-none">
+                          {{ c.title }}
+                        </a>
+                      </td>
+                      <td><span class="badge bg-success-subtle text-success">{{ c.category.name }}</span></td>
+                      <td><span class="badge bg-primary">{{ c.get_status_display }}</span></td>
+                      <td>{{ c.views_count }}</td>
+                      <td>{{ c.proposals.count }}</td>
+                      <td>
+                        <div class="btn-group btn-group-sm">
+                          <a href="{% url 'challenges:challenge_detail' slug=c.slug %}" class="btn btn-outline-secondary">View</a>
+                          <a href="{% url 'challenges:challenge_update' slug=c.slug %}" class="btn btn-outline-primary">Edit</a>
+                        </div>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <i class="bi bi-megaphone text-muted fs-1 mb-2"></i>
+              <p class="text-muted">You haven't posted any challenges yet.</p>
+              <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success btn-sm">Post Your First Challenge</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Proposals Tab -->
+    <div class="tab-pane fade" id="proposals-tab-pane" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if my_proposals %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Proposal</th>
+                    <th>For Challenge</th>
+                    <th>Status</th>
+                    <th>Upvotes</th>
+                    <th>Submitted</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in my_proposals %}
+                    <tr>
+                      <td class="fw-semibold">
+                        <a href="{% url 'solutions:proposal_detail' pk=p.pk %}" class="text-dark text-decoration-none">
+                          {{ p.title }}
+                        </a>
+                      </td>
+                      <td>
+                        <a href="{% url 'challenges:challenge_detail' slug=p.challenge.slug %}" class="text-decoration-none">
+                          {{ p.challenge.title|truncatechars:40 }}
+                        </a>
+                      </td>
+                      <td><span class="badge bg-info text-dark">{{ p.get_status_display }}</span></td>
+                      <td><i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i>{{ p.upvotes_count }}</td>
+                      <td class="small">{{ p.created_at|date:"M d, Y" }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <p class="text-muted">You haven't submitted any solution proposals yet.</p>
+              <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-success btn-sm">Explore Challenges</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Teams Tab -->
+    <div class="tab-pane fade" id="teams-tab-pane" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if my_team_memberships %}
+            <div class="table-responsive">
+              <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Team Name</th>
+                    <th>Challenge</th>
+                    <th>My Role</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for m in my_team_memberships %}
+                    <tr>
+                      <td class="fw-bold">
+                        <a href="{% url 'collaboration:team_detail' pk=m.team.pk %}" class="text-dark text-decoration-none">
+                          {{ m.team.name }}
+                        </a>
+                      </td>
+                      <td>{{ m.team.challenge.title|truncatechars:40 }}</td>
+                      <td><span class="badge bg-secondary">{{ m.get_role_display }}</span></td>
+                      <td>
+                        <a href="{% url 'collaboration:team_detail' pk=m.team.pk %}" class="btn btn-sm btn-outline-success">
+                          Open Workspace <i class="bi bi-arrow-right"></i>
+                        </a>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <p class="text-muted">You are not part of any project teams yet.</p>
+              <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-success btn-sm">Find a Challenge to Join</a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bookmarks Tab -->
+    <div class="tab-pane fade" id="bookmarks-tab-pane" role="tabpanel">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+          {% if bookmarked_challenges %}
+            <div class="list-group list-group-flush">
+              {% for b in bookmarked_challenges %}
+                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                  <div>
+                    <h6 class="fw-bold mb-1">
+                      <a href="{% url 'challenges:challenge_detail' slug=b.slug %}" class="text-dark text-decoration-none">
+                        {{ b.title }}
+                      </a>
+                    </h6>
+                    <span class="badge bg-success-subtle text-success me-2">{{ b.category.name }}</span>
+                    <span class="small text-muted"><i class="bi bi-geo-alt me-1"></i>{{ b.location }}</span>
+                  </div>
+                  <a href="{% url 'challenges:challenge_detail' slug=b.slug %}" class="btn btn-sm btn-outline-primary">
+                    View
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-5">
+              <p class="text-muted">No bookmarked challenges.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Collaborative Team — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-0 rounded-4">
+        <div class="card-header bg-white py-3 border-bottom">
+          <div class="d-flex justify-content-between align-items-center">
+            <h4 class="fw-bold mb-0">
+              <i class="bi bi-people-fill text-success me-2"></i> Form Implementation Team
+            </h4>
+            <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+          </div>
+        </div>
+
+        <div class="card-body p-4">
+          <!-- Reference Challenge Banner -->
+          <div class="p-3 bg-light rounded-3 mb-4 border">
+            <span class="badge bg-success-subtle text-success me-2">Tackling Challenge:</span>
+            <strong class="text-dark">{{ challenge.title }}</strong>
+          </div>
+
+          <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Team Name <span class="text-danger">*</span></label>
+              {{ form.name }}
+              {% if form.name.errors %}<div class="text-danger small mt-1">{{ form.name.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Team Charter & Goals <span class="text-danger">*</span></label>
+              {{ form.description }}
+              <div class="form-text small">Describe your mission, target milestones, and what roles you want to recruit.</div>
+              {% if form.description.errors %}<div class="text-danger small mt-1">{{ form.description.errors.0 }}</div>{% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fw-semibold">Guiding Solution Proposal (Optional)</label>
+              {{ form.proposal }}
+              <div class="form-text small">Link a proposed solution to guide your implementation tasks.</div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+              <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-light">Cancel</a>
+              <button type="submit" class="btn btn-success fw-semibold px-4">
+                Launch Team Workspace
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

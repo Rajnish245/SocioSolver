@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SocioSolve — Solve Real-World Societal Problems with AI & Collaboration{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-center text-lg-start">
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7">
+        <span class="badge bg-white text-success px-3 py-2 fw-semibold rounded-pill mb-3 shadow-sm">
+          <i class="bi bi-stars text-warning me-1"></i> AI-Augmented Societal Innovation
+        </span>
+        <h1 class="hero-title mb-3">
+          Solve Real-World Societal Problems, Together.
+        </h1>
+        <p class="lead text-light opacity-90 mb-4">
+          SocioSolve connects citizens, students, universities, NGOs, and enterprises to crowdsource real-world challenges, generate AI-guided roadmaps, and build collaborative teams with measurable impact.
+        </p>
+
+        <!-- Search Bar -->
+        <form action="{% url 'challenges:challenge_list' %}" method="GET" class="mb-4">
+          <div class="input-group input-group-lg shadow-sm">
+            <span class="input-group-text bg-white border-0 text-muted ps-3">
+              <i class="bi bi-search"></i>
+            </span>
+            <input type="text" name="q" class="form-control border-0 ps-2" placeholder="Search challenges by keyword, location, or issue (e.g., water leak, solar, school)..." aria-label="Search">
+            <button class="btn btn-warning fw-bold px-4" type="submit">Search</button>
+          </div>
+        </form>
+
+        <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-lg-start">
+          <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-light btn-lg px-4">
+            <i class="bi bi-compass me-1"></i> Explore Challenges
+          </a>
+          <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success btn-lg px-4 shadow">
+            <i class="bi bi-plus-circle me-1"></i> Report a Challenge
+          </a>
+        </div>
+      </div>
+
+      <div class="col-lg-5 text-center">
+        <!-- Interactive Preview Card -->
+        <div class="card shadow-lg border-0 text-start bg-white text-dark p-4 rounded-4">
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <span class="badge bg-success-subtle text-success border border-success px-2 py-1">
+              <i class="bi bi-droplet me-1"></i> Water Conservation
+            </span>
+            <span class="badge bg-danger-subtle text-danger">Priority: High</span>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Water Leakage in Student Dormitory</h5>
+          <p class="text-muted small mb-3">
+            Campus overhead tanks leaking 10,000L daily due to float valve failure.
+          </p>
+          <div class="p-3 bg-light rounded-3 mb-3 border">
+            <div class="d-flex align-items-center text-primary small fw-semibold mb-1">
+              <i class="bi bi-cpu-fill me-1"></i> AI Solution Generated
+            </div>
+            <div class="small text-secondary">
+              Dual ultrasonic IoT cutoff relay + Rain garden overflow swale.
+            </div>
+          </div>
+          <div class="d-flex align-items-center justify-content-between pt-2 border-top small text-muted">
+            <span><i class="bi bi-people-fill text-success me-1"></i> 3 Teams Working</span>
+            <span><i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i> 18 Upvotes</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Live Stats Counter Bar -->
+<section class="bg-white py-4 border-bottom shadow-sm">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-6 col-md-3">
+        <div class="fs-2 fw-bold text-success">{{ stats.total_challenges }}</div>
+        <div class="text-muted small fw-medium text-uppercase">Reported Challenges</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fs-2 fw-bold text-primary">{{ stats.resolved_challenges }}</div>
+        <div class="text-muted small fw-medium text-uppercase">Resolved Challenges</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fs-2 fw-bold text-warning">{{ stats.total_proposals }}</div>
+        <div class="text-muted small fw-medium text-uppercase">Proposed Solutions</div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="fs-2 fw-bold text-info">{{ stats.active_teams }}</div>
+        <div class="text-muted small fw-medium text-uppercase">Active Teams</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <h6 class="text-success fw-bold text-uppercase letter-spacing-1">Collaborative Workflow</h6>
+      <h2 class="fw-bold">How SocioSolve Drives Real Impact</h2>
+      <p class="text-muted">A clear 4-stage pipeline taking real problems from citizen reports to verified community change.</p>
+    </div>
+
+    <div class="row g-4 text-center">
+      <div class="col-md-3">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+          <div class="bg-success-subtle text-success rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-megaphone fs-3"></i>
+          </div>
+          <h5 class="fw-bold">1. Report Challenge</h5>
+          <p class="text-muted small mb-0">Citizens or students document problems in water, energy, education, or healthcare.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+          <div class="bg-primary-subtle text-primary rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-cpu fs-3"></i>
+          </div>
+          <h5 class="fw-bold">2. AI Diagnosis</h5>
+          <p class="text-muted small mb-0">AI breaks down root causes, identifies stakeholders, and drafts 5 practical solution roadmaps.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+          <div class="bg-warning-subtle text-warning rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-people fs-3"></i>
+          </div>
+          <h5 class="fw-bold">3. Form Teams</h5>
+          <p class="text-muted small mb-0">Students and mentors join project teams, manage Kanban tasks, and unlock institutional micro-grants.</p>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card h-100 p-4 border-0 shadow-sm">
+          <div class="bg-info-subtle text-info rounded-circle d-inline-flex align-items-center justify-content-center mx-auto mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-graph-up-arrow fs-3"></i>
+          </div>
+          <h5 class="fw-bold">4. Measure Impact</h5>
+          <p class="text-muted small mb-0">Publish verified outcome reports with recorded beneficiary counts and environmental savings.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Challenge Categories -->
+<section class="py-5 bg-white border-top border-bottom">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h6 class="text-success fw-bold text-uppercase">Explore by Domain</h6>
+        <h2 class="fw-bold mb-0">Key Societal Focus Areas</h2>
+      </div>
+      <a href="{% url 'challenges:challenge_list' %}" class="btn btn-outline-success btn-sm">
+        View All <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-3">
+      {% for category in categories %}
+        <div class="col-6 col-md-4 col-lg-3">
+          <a href="{% url 'challenges:challenge_list' %}?category={{ category.slug }}" class="card text-decoration-none h-100 p-3 hover-shadow border">
+            <div class="d-flex align-items-center">
+              <div class="bg-success-subtle text-success rounded-3 p-2 me-3 fs-4">
+                <i class="bi {{ category.icon_class }}"></i>
+              </div>
+              <div>
+                <h6 class="fw-bold text-dark mb-1">{{ category.name }}</h6>
+                <span class="text-muted small">{{ category.challenge_count }} challenges</span>
+              </div>
+            </div>
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Featured Challenges Grid -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h6 class="text-success fw-bold text-uppercase">Community Highlights</h6>
+        <h2 class="fw-bold mb-0">Active Challenges Seeking Solutions</h2>
+      </div>
+      <a href="{% url 'challenges:challenge_list' %}" class="btn btn-success">
+        Browse All Challenges <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+
+    <div class="row g-4">
+      {% for challenge in featured_challenges %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card h-100 d-flex flex-column shadow-sm border">
+            <div class="card-body d-flex flex-column">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <span class="badge bg-success-subtle text-success border border-success">
+                  <i class="bi {{ challenge.category.icon_class }} me-1"></i> {{ challenge.category.name }}
+                </span>
+                <span class="badge {% if challenge.status == 'open' %}bg-primary{% elif challenge.status == 'in_progress' %}bg-warning text-dark{% elif challenge.status == 'resolved' %}bg-success{% else %}bg-secondary{% endif %}">
+                  {{ challenge.get_status_display }}
+                </span>
+              </div>
+
+              <h5 class="card-title fw-bold">
+                <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="text-dark text-decoration-none">
+                  {{ challenge.title }}
+                </a>
+              </h5>
+
+              <p class="card-text text-muted small text-truncate-3 flex-grow-1">
+                {{ challenge.description }}
+              </p>
+
+              <div class="small text-secondary mb-3">
+                <i class="bi bi-geo-alt me-1 text-danger"></i> {{ challenge.location }}
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top small text-muted">
+                <span>By <strong>{{ challenge.creator.username }}</strong></span>
+                <div class="d-flex gap-2">
+                  <span><i class="bi bi-eye me-1"></i>{{ challenge.views_count }}</span>
+                  <span><i class="bi bi-lightbulb me-1"></i>{{ challenge.proposals.count }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer bg-white border-0 pt-0 pb-3">
+              <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-success btn-sm w-100">
+                View Challenge & Propose <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">No challenges posted yet. Be the first to submit one!</p>
+          <a href="{% url 'challenges:challenge_create' %}" class="btn btn-success">Post a Challenge</a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Banner -->
+<section class="bg-success text-white py-5 text-center">
+  <div class="container py-3">
+    <h2 class="fw-bold mb-3">Ready to Solve a Real Community Challenge?</h2>
+    <p class="lead mb-4 mx-auto" style="max-width: 650px;">
+      Join thousands of students, researchers, citizens, and impact companies making a difference today.
+    </p>
+    <div class="d-flex justify-content-center gap-3">
+      {% if not user.is_authenticated %}
+        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4 fw-bold text-success">
+          Create Free Account
+        </a>
+      {% else %}
+        <a href="{% url 'challenges:challenge_create' %}" class="btn btn-light btn-lg px-4 fw-bold text-success">
+          Post a Problem
+        </a>
+      {% endif %}
+      <a href="{% url 'impact:dashboard' %}" class="btn btn-outline-light btn-lg px-4">
+        View Impact Data
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

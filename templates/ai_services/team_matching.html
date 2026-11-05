@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Team Matching — {{ challenge.title }} — SocioSolve{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'challenges:landing' %}" class="text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="text-decoration-none">{{ challenge.title|truncatechars:25 }}</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Smart Team Matching</li>
+    </ol>
+  </nav>
+
+  <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 ai-box">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h3 class="fw-bold mb-1"><i class="bi bi-people-fill text-success me-2"></i> Smart Team Matching</h3>
+        <p class="text-muted small mb-0">Recommending skilled collaborators and institutional partners for <strong>{{ challenge.title }}</strong>.</p>
+      </div>
+      <a href="{% url 'challenges:challenge_detail' slug=challenge.slug %}" class="btn btn-outline-secondary btn-sm">
+        Back to Challenge
+      </a>
+    </div>
+
+    <!-- Safety Notice -->
+    <div class="alert alert-light border mt-3 mb-0 small text-secondary">
+      <i class="bi bi-info-circle-fill text-primary me-1"></i>
+      <strong>Collaborator Recommendation Policy:</strong> Matches are calculated using public profile skills and interests. Recommendations do not automatically enroll anyone. Team leads must invite prospective members, and members must consent.
+    </div>
+  </div>
+
+  <!-- Candidates Grid -->
+  <div class="row g-4">
+    {% for rec in recommendations %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100 border-0 shadow-sm rounded-4 p-4 d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <span class="badge bg-success-subtle text-success border border-success">
+              {{ rec.user.get_role_display }}
+            </span>
+            <span class="badge bg-primary text-white">
+              {{ rec.score }}% Match
+            </span>
+          </div>
+
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold fs-5" style="width: 48px; height: 48px;">
+              {{ rec.user.username|make_list|first|upper }}
+            </div>
+            <div>
+              <h5 class="fw-bold mb-0">
+                <a href="{% url 'accounts:profile' username=rec.user.username %}" class="text-dark text-decoration-none">
+                  {{ rec.user.get_full_name|default:rec.user.username }}
+                </a>
+              </h5>
+              <div class="small text-muted">{{ rec.user.organization_name|default:rec.user.location|default:"Community Member" }}</div>
+            </div>
+          </div>
+
+          <div class="p-3 bg-light rounded-3 border mb-3 flex-grow-1">
+            <div class="fw-bold small text-muted text-uppercase mb-1"><i class="bi bi-stars text-warning me-1"></i> Why Recommended:</div>
+            <p class="small text-secondary mb-0">{{ rec.reason }}</p>
+          </div>
+
+          <div class="small text-muted mb-3">
+            <strong>Suggested Role:</strong> {{ rec.role_suggestion }}
+          </div>
+
+          <div class="d-flex gap-2 mt-auto">
+            <a href="{% url 'accounts:profile' username=rec.user.username %}" class="btn btn-outline-secondary btn-sm flex-fill">
+              View Profile
+            </a>
+            <a href="{% url 'collaboration:team_create' challenge_slug=challenge.slug %}" class="btn btn-success btn-sm flex-fill">
+              Invite to Team
+            </a>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center py-5 text-muted">
+        <p>No matching collaborators found currently.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
