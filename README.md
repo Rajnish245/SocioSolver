@@ -323,3 +323,5 @@ For production deployment settings, see `docs/ARCHITECTURE.md`.
 ## License
 
 This project was built as an educational and portfolio demonstration. All AI-generated content is labeled with appropriate disclaimers. Do not use demo credentials or sample data in production.
+#   S o c i o S o l v e r  
+ 
